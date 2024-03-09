@@ -1,14 +1,12 @@
 const express = require('express');
 const fs = require('fs');
-
-//file handling path
 const path = require('path');
+const middleware = require('./middleware'); 
 
+// Create an Express application
 const app = express();
-// Use environment variable for port or default to 3000
-const port = process.env.PORT || 3000; 
-// Use path.join for cross-platform compatibility
-const userFile = path.join(__dirname, 'users.txt'); 
+const port = process.env.PORT || 3000;
+const userFile = path.join(__dirname, 'users.txt');
 
 // Function to read user data
 const getUsers = () => {
@@ -17,7 +15,6 @@ const getUsers = () => {
       if (err) {
         reject(err);
       } else {
-        // Resolve with empty string if no data
         resolve(data || ''); 
       }
     });
@@ -36,13 +33,14 @@ app.get('/users', async (req, res) => {
     res.send(users);
   } catch (err) {
     console.error('Error reading user data:', err);
-    // Error message 
+    // Internal Server Error
     res.status(500).send('Error retrieving users.'); 
   }
 });
 
 // Route handler for "/create"
 app.get('/create', (req, res) => {
+    // Send create.html file
   res.sendFile(path.join(__dirname, 'create.html')); 
 });
 
@@ -53,18 +51,21 @@ app.post('/add', express.urlencoded({ extended: true }), async (req, res) => {
   try {
     // Use fs.promises for async/await
     await fs.promises.appendFile(userFile, userName + '\n'); 
-    // Redirect to /users after successful addition
-    res.redirect('/users'); 
+     // Redirect to /users after successful addition
+    res.redirect('/users');
   } catch (err) {
     console.error('Error adding user:', err);
-    // Send 500 status code and error message
+    // Internal Server Error
     res.status(500).send('Error adding user.'); 
   }
 });
 
+// Apply the notFoundHandler middleware to handle any unmatched routes
+app.use(middleware.notFoundHandler);
+
 // Error handling middleware (optional)
 app.use((err, req, res, next) => {
-  console.error(err.stack); 
+  console.error(err.stack);
   res.status(500).send('Internal Server Error');
 });
 
