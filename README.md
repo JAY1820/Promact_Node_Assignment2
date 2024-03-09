@@ -17,3 +17,8 @@ Simple app to create & view users in `users.txt`
 4. `nodemon index.js`
 
 **Access:** http://localhost:3000/
+## Others Urls
+- http://localhost:3000/create
+- http://localhost:3000/users
+- http://localhost:3000/404
+
