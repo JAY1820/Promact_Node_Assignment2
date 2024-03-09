@@ -1,10 +1,14 @@
 const express = require('express');
 const fs = require('fs');
-const path = require('path'); // Added for path handling
+
+//file handling path
+const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000; // Use environment variable for port
-const userFile = path.join(__dirname, 'users.txt'); // Use path.join for cross-platform compatibility
+// Use environment variable for port or default to 3000
+const port = process.env.PORT || 3000; 
+// Use path.join for cross-platform compatibility
+const userFile = path.join(__dirname, 'users.txt'); 
 
 // Function to read user data
 const getUsers = () => {
@@ -13,7 +17,8 @@ const getUsers = () => {
       if (err) {
         reject(err);
       } else {
-        resolve(data || ''); // Resolve with empty string if no data
+        // Resolve with empty string if no data
+        resolve(data || ''); 
       }
     });
   });
@@ -31,13 +36,14 @@ app.get('/users', async (req, res) => {
     res.send(users);
   } catch (err) {
     console.error('Error reading user data:', err);
-    res.status(500).send('Error retrieving users.'); // Internal Server Error
+    // Error message 
+    res.status(500).send('Error retrieving users.'); 
   }
 });
 
 // Route handler for "/create"
 app.get('/create', (req, res) => {
-  res.sendFile(path.join(__dirname, 'create.html')); // Send create.html file
+  res.sendFile(path.join(__dirname, 'create.html')); 
 });
 
 // Route handler for "/add" (POST request)
@@ -45,17 +51,20 @@ app.post('/add', express.urlencoded({ extended: true }), async (req, res) => {
   const userName = req.body.userName;
 
   try {
-    await fs.promises.appendFile(userFile, userName + '\n'); // Use fs.promises for async/await
-    res.redirect('/users'); // Redirect to /users after successful addition
+    // Use fs.promises for async/await
+    await fs.promises.appendFile(userFile, userName + '\n'); 
+    // Redirect to /users after successful addition
+    res.redirect('/users'); 
   } catch (err) {
     console.error('Error adding user:', err);
-    res.status(500).send('Error adding user.'); // Internal Server Error
+    // Send 500 status code and error message
+    res.status(500).send('Error adding user.'); 
   }
 });
 
 // Error handling middleware (optional)
 app.use((err, req, res, next) => {
-  console.error(err.stack); // Log errors
+  console.error(err.stack); 
   res.status(500).send('Internal Server Error');
 });
 
